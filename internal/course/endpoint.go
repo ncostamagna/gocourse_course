@@ -47,13 +47,6 @@ type (
 		ID string
 	}
 
-	Response struct {
-		Status int         `json:"status"`
-		Data   interface{} `json:"data,omitempty"`
-		Err    string      `json:"error,omitempty"`
-		Meta   *meta.Meta  `json:"meta,omitempty"`
-	}
-
 	Config struct {
 		LimPageDef string
 	}
@@ -89,7 +82,8 @@ func makeCreateEndpoint(s Service) Controller {
 		course, err := s.Create(ctx, req.Name, req.StartDate, req.EndDate)
 		if err != nil {
 
-			if err == ErrInvalidStartDate ||
+			if err == ErrEndLesserStart ||
+				err == ErrInvalidStartDate ||
 				err == ErrInvalidEndDate {
 				return nil, response.BadRequest(err.Error())
 			}
@@ -165,7 +159,8 @@ func makeUpdateEndpoint(s Service) Controller {
 
 		if err := s.Update(ctx, req.ID, req.Name, req.StartDate, req.EndDate); err != nil {
 
-			if err == ErrInvalidStartDate ||
+			if err == ErrEndLesserStart ||
+				err == ErrInvalidStartDate ||
 				err == ErrInvalidEndDate {
 				return nil, response.BadRequest(err.Error())
 			}
